@@ -62,43 +62,6 @@ export class LogoutResponseDto {
   message: string;
 }
 
-export class ErrorResponseDto {
-  @ApiProperty({
-    example: 400,
-    description: 'HTTP status code',
-    type: 'number',
-  })
-  code: number;
-
-  @ApiProperty({
-    example: false,
-    description: 'Response success status',
-    type: 'boolean',
-  })
-  success: boolean;
-
-  @ApiProperty({
-    example: ['email must be an email', 'password must be at least 8 characters'],
-    description: 'Error message or validation error details',
-    oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }],
-  })
-  message: string | string[];
-
-  @ApiProperty({
-    example: 'BadRequestException',
-    description: 'Error type',
-    type: 'string',
-  })
-  error: string;
-
-  @ApiProperty({
-    example: '2025-11-28T10:00:00.000Z',
-    description: 'Response timestamp',
-    type: 'string',
-  })
-  timestamp: string;
-}
-
 // Wrapper DTOs for SuccessResponse format
 export class SuccessAuthResponseDto {
   @ApiProperty({

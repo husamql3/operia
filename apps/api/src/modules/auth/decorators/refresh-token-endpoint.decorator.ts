@@ -1,6 +1,7 @@
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { SuccessRefreshTokenResponseDto, ErrorResponseDto } from '../dto';
+import { SuccessRefreshTokenResponseDto } from '../dto';
+import { ErrorResponseDto } from '@/common/dto';
 import { AuthExamples } from '@/constants/examples';
 
 export function AuthRefreshTokenDecorator() {

@@ -1,6 +1,7 @@
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { SuccessAuthResponseDto, ErrorResponseDto } from '../dto';
+import { SuccessAuthResponseDto } from '../dto';
+import { ErrorResponseDto } from '@/common/dto';
 import { AuthExamples } from '@/constants/examples';
 
 export function AuthGoogleDecorator() {

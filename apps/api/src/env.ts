@@ -53,6 +53,12 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1, 'GOOGLE_CLIENT_SECRET is required'),
   GOOGLE_CALLBACK_URL: z.string().default('http://localhost:3000/api/auth/google/callback'),
 
+  // Notion OAuth
+  NOTION_CLIENT_ID: z.string().min(1, 'NOTION_CLIENT_ID is required'),
+  NOTION_CLIENT_SECRET: z.string().min(1, 'NOTION_CLIENT_SECRET is required'),
+  NOTION_REDIRECT_URI: z.string().default('http://localhost:3000/api/integrations/notion/callback'),
+  NOTION_API_BASE_URL: z.string().default('https://api.notion.com/v1'),
+
   // Client URL for redirects
   CLIENT_URL: z.string().default('http://localhost:5173'),
 });

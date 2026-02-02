@@ -1,6 +1,7 @@
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { SuccessLogoutResponseDto, ErrorResponseDto } from '../dto';
+import { SuccessLogoutResponseDto } from '../dto';
+import { ErrorResponseDto } from '@/common/dto';
 import { AuthExamples } from '@/constants/examples';
 
 export function AuthLogoutDecorator() {

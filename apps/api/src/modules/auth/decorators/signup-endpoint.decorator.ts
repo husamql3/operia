@@ -1,6 +1,7 @@
 import { applyDecorators, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { SuccessAuthResponseDto, ErrorResponseDto, SignupDto } from '../dto';
+import { SuccessAuthResponseDto, SignupDto } from '../dto';
+import { ErrorResponseDto } from '@/common/dto';
 import { AuthExamples } from '@/constants/examples';
 
 export function AuthSignupDecorator() {
