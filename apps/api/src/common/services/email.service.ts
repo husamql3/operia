@@ -50,7 +50,7 @@ export class EmailService {
       await this.transporter.sendMail({
         from: env.MAIL_FROM,
         to,
-        subject: 'Verify Your Email - Basti',
+        subject: 'Verify Your Email - operia',
         html: htmlContent,
       });
 
@@ -73,7 +73,7 @@ export class EmailService {
       await this.transporter.sendMail({
         from: env.MAIL_FROM,
         to,
-        subject: 'Welcome to Basti!',
+        subject: 'Welcome to Operia!',
         html: htmlContent,
       });
 
@@ -108,7 +108,7 @@ export class EmailService {
       await this.transporter.sendMail({
         from: env.MAIL_FROM,
         to,
-        subject: 'Reset Your Password - Basti',
+        subject: 'Reset Your Password - Operia',
         html: htmlContent,
       });
 

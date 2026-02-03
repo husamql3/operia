@@ -1,6 +1,6 @@
 # Naming Conventions
 
-This document outlines all naming conventions used throughout the Basti backend service.
+This document outlines all naming conventions used throughout the Operia backend service.
 
 ## 📋 Table of Contents
 
@@ -540,7 +540,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=admin
 DB_PASSWORD=password
-DB_DATABASE=basti
+DB_DATABASE=operia
 DB_SSL=false
 
 # JWT
@@ -560,8 +560,8 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
-MAIL_FROM_NAME=Basti
-MAIL_FROM=noreply@basti.com
+MAIL_FROM_NAME=Operia
+MAIL_FROM=noreply@operia.com
 ```
 
 **Rules:**

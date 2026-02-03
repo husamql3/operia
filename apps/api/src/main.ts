@@ -44,8 +44,8 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Basti API')
-    .setDescription('API documentation for Basti application')
+    .setTitle('Operia API')
+    .setDescription('API documentation for Operia application')
     .setVersion('0.0.1')
     .addTag('App', 'Application health and status')
     .addTag('auth', 'Authentication endpoints')

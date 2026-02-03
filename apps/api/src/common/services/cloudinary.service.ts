@@ -49,14 +49,14 @@ export class CloudinaryService {
    * Upload a single file to Cloudinary
    * @param buffer - File buffer to upload
    * @param originalFilename - Original filename with extension
-   * @param folder - Folder path in Cloudinary (default: "basti")
+   * @param folder - Folder path in Cloudinary (default: "operia")
    * @param resourceType - Type of resource: image, video, or raw (default: "image")
    * @returns CloudinaryUploadResult with file metadata
    */
   async uploadFile(
     buffer: Buffer,
     originalFilename: string,
-    folder: string = 'basti',
+    folder: string = 'operia',
     resourceType: 'image' | 'video' | 'raw' = 'image',
   ): Promise<CloudinaryUploadResult> {
     const publicId = `${Date.now()}-${originalFilename.split('.')[0]}`;
@@ -126,13 +126,13 @@ export class CloudinaryService {
   /**
    * Upload multiple files to Cloudinary in parallel
    * @param files - Array of file objects with buffer and originalFilename
-   * @param folder - Folder path in Cloudinary (default: "basti")
+   * @param folder - Folder path in Cloudinary (default: "operia")
    * @param resourceType - Type of resource: image, video, or raw (default: "image")
    * @returns Array of CloudinaryUploadResult objects
    */
   async uploadMultipleFiles(
     files: { buffer: Buffer; originalFilename: string }[],
-    folder: string = 'basti',
+    folder: string = 'operia',
     resourceType: 'image' | 'video' | 'raw' = 'image',
   ): Promise<CloudinaryUploadResult[]> {
     this.logger.debug(`Uploading ${files.length} files to folder: ${folder}`);

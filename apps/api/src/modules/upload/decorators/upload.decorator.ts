@@ -1,5 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiConsumes, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  UploadImageSuccessResponseDto,
+  DeleteImagesSuccessResponseDto,
+  UploadErrorResponseDto,
+} from '../dto';
 
 /**
  * Decorator for image upload endpoint
@@ -30,44 +35,44 @@ export function UploadImageDecorator(description: string = 'Upload image') {
     ApiResponse({
       status: 201,
       description: 'Image uploaded successfully',
-      schema: {
-        example: {
-          code: 201,
-          success: true,
-          message: 'Image uploaded successfully',
-          data: {
-            public_id: 'basti/chefs/1234567890-chef',
-            url: 'http://res.cloudinary.com/dzyxpwpcb/image/upload/basti/chefs/1234567890-chef.jpg',
-            secure_url:
-              'https://res.cloudinary.com/dzyxpwpcb/image/upload/basti/chefs/1234567890-chef.jpg',
-            size: 102400,
-            format: 'jpg',
-            resource_type: 'image',
-          },
-          timestamp: '2026-01-18T12:00:00.000Z',
+      type: UploadImageSuccessResponseDto,
+      example: {
+        code: 201,
+        success: true,
+        message: 'Image uploaded successfully',
+        data: {
+          public_id: 'operia/chefs/1234567890-chef',
+          url: 'http://res.cloudinary.com/dzyxpwpcb/image/upload/operia/chefs/1234567890-chef.jpg',
+          secure_url:
+            'https://res.cloudinary.com/dzyxpwpcb/image/upload/operia/chefs/1234567890-chef.jpg',
+          size: 102400,
+          format: 'jpg',
+          resource_type: 'image',
         },
+        timestamp: '2026-01-18T12:00:00.000Z',
       },
     }),
     ApiResponse({
       status: 400,
       description: 'Bad Request - Invalid file or missing required field',
-      schema: {
-        example: {
-          code: 400,
-          success: false,
-          message: 'No file uploaded',
-          error: 'Bad Request',
-          timestamp: '2026-01-18T12:00:00.000Z',
-        },
+      type: UploadErrorResponseDto,
+      example: {
+        code: 400,
+        success: false,
+        message: 'No file uploaded',
+        error: 'Bad Request',
+        timestamp: '2026-01-18T12:00:00.000Z',
       },
     }),
     ApiResponse({
       status: 401,
       description: 'Unauthorized - Invalid or missing JWT token',
+      type: UploadErrorResponseDto,
     }),
     ApiResponse({
       status: 403,
       description: 'Forbidden - Insufficient permissions',
+      type: UploadErrorResponseDto,
     }),
   );
 }
@@ -88,8 +93,8 @@ export function DeleteImagesDecorator(description: string = 'Delete images') {
       schema: {
         example: {
           urls: [
-            'https://res.cloudinary.com/dzyxpwpcb/image/upload/v1763349477/basti/chefs/1234567890-chef.jpg',
-            'https://res.cloudinary.com/dzyxpwpcb/image/upload/v1763349478/basti/chefs/1234567890-chef2.jpg',
+            'https://res.cloudinary.com/dzyxpwpcb/image/upload/v1763349477/operia/chefs/1234567890-chef.jpg',
+            'https://res.cloudinary.com/dzyxpwpcb/image/upload/v1763349478/operia/chefs/1234567890-chef2.jpg',
           ],
         },
       },
@@ -97,34 +102,36 @@ export function DeleteImagesDecorator(description: string = 'Delete images') {
     ApiResponse({
       status: 200,
       description: 'Images deletion completed',
-      schema: {
-        example: {
-          code: 200,
-          success: true,
-          message: 'Images deleted',
-          data: {
-            results: {
-              'basti/chefs/1234567890-chef': 'ok',
-              'basti/chefs/1234567890-chef2': 'ok',
-            },
-            success: 2,
-            failed: 0,
+      type: DeleteImagesSuccessResponseDto,
+      example: {
+        code: 200,
+        success: true,
+        message: 'Images deleted',
+        data: {
+          results: {
+            'operia/chefs/1234567890-chef': 'ok',
+            'operia/chefs/1234567890-chef2': 'ok',
           },
-          timestamp: '2026-01-18T12:00:00.000Z',
+          success: 2,
+          failed: 0,
         },
+        timestamp: '2026-01-18T12:00:00.000Z',
       },
     }),
     ApiResponse({
       status: 400,
       description: 'Bad Request - No URLs provided',
+      type: UploadErrorResponseDto,
     }),
     ApiResponse({
       status: 401,
       description: 'Unauthorized - Invalid or missing JWT token',
+      type: UploadErrorResponseDto,
     }),
     ApiResponse({
       status: 403,
       description: 'Forbidden - Insufficient permissions',
+      type: UploadErrorResponseDto,
     }),
   );
 }

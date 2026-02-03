@@ -2,11 +2,6 @@ import { Controller, Get, Post, Query, UseGuards, Logger, Res, Body } from '@nes
 import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { NotionService } from '../services/notion.service';
-import {
-  InitiateOAuthResponseDto,
-  IntegrationStatusResponseDto,
-  DisconnectIntegrationResponseDto,
-} from '../dto';
 import { Public, CurrentUser, JwtAuthGuard } from '@/common';
 import { env } from '@/env';
 import {
@@ -26,7 +21,7 @@ export class NotionController {
   @UseGuards(JwtAuthGuard)
   @Get('auth')
   @NotionInitiateOAuthDecorator()
-  initiateAuth(@CurrentUser('sub') userId: string): InitiateOAuthResponseDto {
+  initiateAuth(@CurrentUser('sub') userId: string) {
     this.logger.debug(`Initiating Notion OAuth for user: ${userId}`);
     return this.notionService.initiateOAuthFlow(userId);
   }
@@ -74,9 +69,7 @@ export class NotionController {
   @UseGuards(JwtAuthGuard)
   @Get('status')
   @NotionStatusDecorator()
-  async getIntegrationStatus(
-    @CurrentUser('sub') userId: string,
-  ): Promise<IntegrationStatusResponseDto> {
+  async getIntegrationStatus(@CurrentUser('sub') userId: string) {
     this.logger.debug(`Getting Notion integration status for user: ${userId}`);
     return this.notionService.getIntegrationStatusFlow(userId);
   }
@@ -84,7 +77,7 @@ export class NotionController {
   @UseGuards(JwtAuthGuard)
   @Post('disconnect')
   @NotionDisconnectDecorator()
-  async disconnect(@CurrentUser('sub') userId: string): Promise<DisconnectIntegrationResponseDto> {
+  async disconnect(@CurrentUser('sub') userId: string) {
     this.logger.debug(`Disconnecting Notion integration for user: ${userId}`);
     return this.notionService.disconnectIntegration(userId);
   }

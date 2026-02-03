@@ -1,6 +1,10 @@
 export { SaveNotionIntegrationDto } from './save-notion-integration.dto';
 export { InitiateOAuthResponseDto } from './initiate-oauth-response.dto';
+export { InitiateOAuthSuccessResponseDto } from './initiate-oauth-success-response.dto';
 export { IntegrationDto } from './integration.dto';
 export { SaveIntegrationResponseDto } from './save-integration-response.dto';
 export { IntegrationStatusResponseDto } from './integration-status-response.dto';
+export { GetIntegrationStatusSuccessResponseDto } from './get-integration-status-success-response.dto';
 export { DisconnectIntegrationResponseDto } from './disconnect-integration-response.dto';
+export { DisconnectIntegrationDataDto } from './disconnect-integration-data.dto';
+export { DisconnectIntegrationSuccessResponseDto } from './disconnect-integration-success-response.dto';

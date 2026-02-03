@@ -4,7 +4,7 @@ import busboy from 'busboy';
 import { Request } from 'express';
 import { CloudinaryService } from '@/common/services/cloudinary.service';
 import { UploadImageDecorator, DeleteImagesDecorator } from './decorators/upload.decorator';
-import { FlexibleJwtGuard } from '@/common/guards/flexible-jwt.guard';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { successResponse } from '@/utils/response.handler';
 
 export interface DeleteImageDto {
@@ -21,14 +21,14 @@ export class UploadController {
   /**
    * Upload image to Cloudinary with dynamic folder path
    * @param file - Image file to upload
-   * @param folder - Target folder in Cloudinary (e.g., 'basti/chefs', 'basti/products')
+   * @param folder - Target folder in Cloudinary (e.g., 'operia/chefs', 'operia/products')
    * @returns CloudinaryUploadResult with secure_url
    */
   @Post('image')
-  @UseGuards(FlexibleJwtGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiQuery({ name: 'folder', required: false, description: 'Target folder in Cloudinary' })
   @UploadImageDecorator('Upload image to Cloudinary')
-  async uploadImage(@Req() req: Request, @Query('folder') folder: string = 'basti/general') {
+  async uploadImage(@Req() req: Request, @Query('folder') folder: string = 'operia/general') {
     return new Promise((resolve) => {
       try {
         const bufferedChunks: Buffer[] = [];
@@ -74,13 +74,13 @@ export class UploadController {
               let originalFilename: string;
               let fileMimetype: string;
 
-              bb.on('file', (fieldname: string, file: any, fileInfo: any) => {
+              bb.on('file', (fieldname, file, fileInfo) => {
                 if (fieldname === 'file') {
                   originalFilename = fileInfo.filename;
                   fileMimetype = fileInfo.mimeType;
 
                   const chunks: Buffer[] = [];
-                  file.on('data', (data: Buffer) => {
+                  file.on('data', (data) => {
                     chunks.push(data);
                   });
 
@@ -88,7 +88,7 @@ export class UploadController {
                     fileBuffer = Buffer.concat(chunks);
                   });
 
-                  file.on('error', (err: unknown) => {
+                  file.on('error', (err) => {
                     const errorMsg =
                       err instanceof Error
                         ? err.message
@@ -100,61 +100,61 @@ export class UploadController {
                 }
               });
 
-              bb.on('close', async () => {
-                try {
-                  if (!fileBuffer || !originalFilename) {
-                    this.logger.error('No file provided for upload');
-                    return resolve(successResponse({ secure_url: null }, 'No file provided', 400));
-                  }
+              bb.on('close', () => {
+                this.cloudinaryService
+                  .uploadFile(fileBuffer, originalFilename, folder, 'image')
+                  .then((result) => {
+                    if (!fileBuffer || !originalFilename) {
+                      this.logger.error('No file provided for upload');
+                      return resolve(
+                        successResponse({ secure_url: null }, 'No file provided', 400),
+                      );
+                    }
 
-                  const maxSize = 5 * 1024 * 1024;
-                  if (fileBuffer.length > maxSize) {
-                    this.logger.error(`File size ${fileBuffer.length} exceeds max size ${maxSize}`);
-                    return resolve(
-                      successResponse({ secure_url: null }, 'File size exceeds 5MB', 400),
+                    const maxSize = 5 * 1024 * 1024;
+                    if (fileBuffer.length > maxSize) {
+                      this.logger.error(
+                        `File size ${fileBuffer.length} exceeds max size ${maxSize}`,
+                      );
+                      return resolve(
+                        successResponse({ secure_url: null }, 'File size exceeds 5MB', 400),
+                      );
+                    }
+
+                    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (fileMimetype && !allowedMimeTypes.includes(fileMimetype)) {
+                      this.logger.error(`Invalid file type: ${fileMimetype}`);
+                      return resolve(
+                        successResponse(
+                          { secure_url: null },
+                          'Invalid file type. Allowed: JPEG, PNG, GIF, WebP',
+                          400,
+                        ),
+                      );
+                    }
+
+                    this.logger.debug(
+                      `Uploading image to folder: ${folder}, filename: ${originalFilename}, mimetype: ${fileMimetype}`,
                     );
-                  }
 
-                  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                  if (fileMimetype && !allowedMimeTypes.includes(fileMimetype)) {
-                    this.logger.error(`Invalid file type: ${fileMimetype}`);
+                    this.logger.log(`Image uploaded to ${folder}: ${result.public_id}`);
+                    return resolve(successResponse(result, 'Image uploaded successfully', 201));
+                  })
+                  .catch((error) => {
+                    this.logger.error(
+                      `Upload failed: ${error instanceof Error ? error.message : String(error)}`,
+                    );
                     return resolve(
                       successResponse(
                         { secure_url: null },
-                        'Invalid file type. Allowed: JPEG, PNG, GIF, WebP',
-                        400,
+                        'Failed to upload image to Cloudinary',
+                        500,
                       ),
                     );
-                  }
-
-                  this.logger.debug(
-                    `Uploading image to folder: ${folder}, filename: ${originalFilename}, mimetype: ${fileMimetype}`,
-                  );
-
-                  const result = await this.cloudinaryService.uploadFile(
-                    fileBuffer,
-                    originalFilename,
-                    folder,
-                    'image',
-                  );
-
-                  this.logger.log(`Image uploaded to ${folder}: ${result.public_id}`);
-                  return resolve(successResponse(result, 'Image uploaded successfully', 201));
-                } catch (error) {
-                  this.logger.error(
-                    `Upload failed: ${error instanceof Error ? error.message : String(error)}`,
-                  );
-                  return resolve(
-                    successResponse(
-                      { secure_url: null },
-                      'Failed to upload image to Cloudinary',
-                      500,
-                    ),
-                  );
-                }
+                  });
               });
 
-              bb.on('error', (err: unknown) => {
+              bb.on('error', (err) => {
                 const errorMsg =
                   err instanceof Error ? err.message : typeof err === 'string' ? err : 'unknown';
                 this.logger.error(`Busboy error: ${errorMsg}`);
@@ -188,7 +188,7 @@ export class UploadController {
    * @returns DeleteImageResult with success/failed counts
    */
   @Delete('images')
-  @UseGuards(FlexibleJwtGuard)
+  @UseGuards(JwtAuthGuard)
   @DeleteImagesDecorator('Delete images by URLs')
   async deleteImages(@Body() { urls }: DeleteImageDto) {
     this.logger.debug(`Deleting ${urls.length} images`);

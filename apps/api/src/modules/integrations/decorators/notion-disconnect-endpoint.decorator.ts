@@ -1,8 +1,8 @@
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { DisconnectIntegrationResponseDto } from '../dto';
-import { ErrorResponseDto } from '@/common/dto';
 import { NotionExamples } from '@/constants/examples';
+import { ErrorResponseDto } from '@/common/dto';
+import { DisconnectIntegrationSuccessResponseDto } from '../dto';
 
 export function NotionDisconnectDecorator() {
   return applyDecorators(
@@ -15,7 +15,7 @@ export function NotionDisconnectDecorator() {
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Integration disconnected successfully',
-      type: DisconnectIntegrationResponseDto,
+      type: DisconnectIntegrationSuccessResponseDto,
       example: NotionExamples.disconnect.response.success,
     }),
     ApiResponse({

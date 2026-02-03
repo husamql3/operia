@@ -1,8 +1,8 @@
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { IntegrationStatusResponseDto } from '../dto';
-import { ErrorResponseDto } from '@/common/dto';
 import { NotionExamples } from '@/constants/examples';
+import { ErrorResponseDto } from '@/common/dto';
+import { GetIntegrationStatusSuccessResponseDto } from '../dto';
 
 export function NotionStatusDecorator() {
   return applyDecorators(
@@ -15,7 +15,7 @@ export function NotionStatusDecorator() {
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Integration status retrieved successfully',
-      type: IntegrationStatusResponseDto,
+      type: GetIntegrationStatusSuccessResponseDto,
       examples: {
         connected: {
           summary: 'Notion is connected',

@@ -9,13 +9,9 @@ import { integrations, type Integration } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { env } from '@/env';
 import { HttpStatus } from '@nestjs/common';
-import { errorResponse } from '@/utils';
+import { errorResponse, successResponse } from '@/utils';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
-import {
-  InitiateOAuthResponseDto,
-  IntegrationStatusResponseDto,
-  DisconnectIntegrationResponseDto,
-} from '../dto';
+import { IntegrationStatusResponseDto } from '../dto';
 import type { NotionTokenResponse } from '../types';
 
 @Injectable()
@@ -44,7 +40,7 @@ export class NotionService {
     }
   }
 
-  initiateOAuthFlow(userId: string): InitiateOAuthResponseDto {
+  initiateOAuthFlow(userId: string) {
     this.logger.log(`[INITIATE] Starting OAuth flow for userId: ${userId}`);
 
     const state = this.encryptUserId(userId);
@@ -61,10 +57,11 @@ export class NotionService {
     const authUrl = `${env.NOTION_API_BASE_URL}/oauth/authorize?${params.toString()}`;
     this.logger.log(`[INITIATE] Generated OAuth authorization URL`);
 
-    return {
-      authUrl,
-      state,
-    };
+    return successResponse(
+      { authUrl, state },
+      'Notion OAuth authorization URL generated',
+      HttpStatus.OK,
+    );
   }
 
   async exchangeCodeForToken(code: string): Promise<NotionTokenResponse> {
@@ -228,11 +225,12 @@ export class NotionService {
     }
   }
 
-  async getIntegrationStatusFlow(userId: string): Promise<IntegrationStatusResponseDto> {
+  async getIntegrationStatusFlow(userId: string) {
     const integration = await this.getIntegration(userId);
 
     this.logger.debug(`Retrieved integration status for user: ${userId}`);
-    return {
+
+    const statusData: IntegrationStatusResponseDto = {
       connected: !!integration,
       workspace: integration?.workspaceName || null,
       integration: integration
@@ -243,16 +241,23 @@ export class NotionService {
           }
         : null,
     };
+
+    return successResponse(statusData, 'Integration status retrieved', HttpStatus.OK);
   }
 
-  async disconnectIntegration(userId: string): Promise<DisconnectIntegrationResponseDto> {
+  async disconnectIntegration(userId: string) {
     try {
       await db
         .delete(integrations)
         .where(and(eq(integrations.userId, userId), eq(integrations.type, 'notion')));
 
       this.logger.log(`Integration disconnected for user: ${userId}`);
-      return { success: true, message: 'Integration disconnected successfully' };
+
+      return successResponse(
+        { success: true },
+        'Integration disconnected successfully',
+        HttpStatus.OK,
+      );
     } catch (error) {
       this.logger.error(`Failed to disconnect integration: ${error}`);
       throw new InternalServerErrorException(
