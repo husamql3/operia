@@ -8,3 +8,4 @@ export { GetIntegrationStatusSuccessResponseDto } from './get-integration-status
 export { DisconnectIntegrationResponseDto } from './disconnect-integration-response.dto';
 export { DisconnectIntegrationDataDto } from './disconnect-integration-data.dto';
 export { DisconnectIntegrationSuccessResponseDto } from './disconnect-integration-success-response.dto';
+export { GetPagesResponseDto } from './get-pages-response.dto';

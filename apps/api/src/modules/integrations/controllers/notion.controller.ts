@@ -9,6 +9,7 @@ import {
   NotionCallbackDecorator,
   NotionStatusDecorator,
   NotionDisconnectDecorator,
+  NotionGetPagesDecorator,
 } from '../decorators';
 
 @ApiTags('integrations')
@@ -26,7 +27,6 @@ export class NotionController {
     return this.notionService.initiateOAuthFlow(userId);
   }
 
-  @Public()
   @Public()
   @Get('callback')
   @NotionCallbackDecorator()
@@ -57,8 +57,13 @@ export class NotionController {
       const integration = await this.notionService.handleCallbackAndSave(code, state);
 
       this.logger.log(`[CALLBACK] Integration saved successfully with id: ${integration.id}`);
+
+      const pages = await this.notionService.fetchAndStorePagesForIntegration(integration);
+
       this.logger.log(`[CALLBACK] Redirecting to client with success=true`);
-      return void res.redirect(`${env.CLIENT_URL}?notion_success=true`);
+
+      const pagesQuery = encodeURIComponent(JSON.stringify(pages));
+      return void res.redirect(`${env.CLIENT_URL}?notion_success=true&pages=${pagesQuery}`);
     } catch (err) {
       this.logger.error(`[CALLBACK] Error in callback handler:`, err);
       const errorParam = encodeURIComponent('Failed to process authorization');
@@ -80,5 +85,36 @@ export class NotionController {
   async disconnect(@CurrentUser('sub') userId: string) {
     this.logger.debug(`Disconnecting Notion integration for user: ${userId}`);
     return this.notionService.disconnectIntegration(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('pages')
+  @NotionGetPagesDecorator()
+  async getPages(@CurrentUser('sub') userId: string) {
+    this.logger.debug(`Getting Notion pages for user: ${userId}`);
+    const integration = await this.notionService.getIntegration(userId);
+
+    if (!integration) {
+      return {
+        code: 404,
+        success: false,
+        message: 'No Notion integration found',
+        data: {
+          pages: {},
+        },
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    const pages = await this.notionService.getPagesForIntegration(integration.id);
+    return {
+      code: 200,
+      success: true,
+      message: 'Pages retrieved successfully',
+      data: {
+        pages,
+      },
+      timestamp: new Date().toISOString(),
+    };
   }
 }

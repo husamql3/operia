@@ -90,4 +90,45 @@ export const NotionExamples = {
       },
     },
   },
-};
+
+  getPages: {
+    response: {
+      success: {
+        code: 200,
+        success: true,
+        message: 'Pages retrieved successfully',
+        data: {
+          pages: {
+            '123e4567-e89b-12d3-a456-426614174000': {
+              id: '123e4567-e89b-12d3-a456-426614174000',
+              title: 'My Page',
+              url: 'https://notion.so/My-Page-123e4567e89b12d3a456426614174000',
+            },
+            '223e4567-e89b-12d3-a456-426614174001': {
+              id: '223e4567-e89b-12d3-a456-426614174001',
+              title: 'Another Page',
+              url: 'https://notion.so/Another-Page-223e4567e89b12d3a456426614174001',
+            },
+          },
+        },
+        timestamp: '2025-11-28T10:00:00.000Z',
+      },
+      notFound: {
+        code: 404,
+        success: false,
+        message: 'No Notion integration found',
+        data: {
+          pages: {},
+        },
+        timestamp: '2025-11-28T10:00:00.000Z',
+      },
+      unauthorized: {
+        code: 401,
+        success: false,
+        message: 'Unauthorized',
+        error: 'UnauthorizedException',
+        timestamp: '2025-11-28T10:00:00.000Z',
+      },
+    },
+  },
+} as const;

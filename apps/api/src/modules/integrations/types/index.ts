@@ -19,3 +19,28 @@ export interface NotionTokenResponse {
   };
   duplicated_template_id: string | null;
 }
+
+export interface NotionSearchResponse {
+  results: Array<{
+    id: string;
+    url: string;
+    parent: {
+      type: 'workspace' | 'database_id' | 'page_id';
+    };
+    properties: {
+      title?: {
+        title: Array<{
+          plain_text: string;
+        }>;
+      };
+    };
+  }>;
+}
+
+export interface NotionPageData {
+  id: string;
+  title: string;
+  url: string;
+}
+
+export type NotionPagesMap = Record<string, NotionPageData>;
