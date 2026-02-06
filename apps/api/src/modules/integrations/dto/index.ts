@@ -9,3 +9,4 @@ export { DisconnectIntegrationResponseDto } from './disconnect-integration-respo
 export { DisconnectIntegrationDataDto } from './disconnect-integration-data.dto';
 export { DisconnectIntegrationSuccessResponseDto } from './disconnect-integration-success-response.dto';
 export { GetPagesResponseDto } from './get-pages-response.dto';
+export { NotionSyncResponseDto } from './notion-sync-response.dto';

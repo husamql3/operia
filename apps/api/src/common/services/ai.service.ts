@@ -137,7 +137,7 @@ export class AIService {
 
     // Initialize axios instance for Azure OpenAI API
     this.axiosInstance = axios.create({
-      timeout: 30000,
+      timeout: 90000,
     });
 
     this.logger.log(

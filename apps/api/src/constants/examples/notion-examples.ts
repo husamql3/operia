@@ -131,4 +131,67 @@ export const NotionExamples = {
       },
     },
   },
+
+  sync: {
+    response: {
+      success: {
+        code: 200,
+        success: true,
+        message: 'Notion content synced and extracted successfully',
+        data: {
+          totalPages: 50,
+          proposalsCount: 14,
+          proposals: [
+            {
+              id: 'prop_123',
+              type: 'task',
+              title: 'Update marketing website',
+              description: 'Redesign the landing page with new branding guidelines',
+              evidence: 'Found in Marketing Tasks page - assigned to Sarah Chen',
+              rationale: 'Improve conversion rates and brand consistency',
+              whatWillHappen: 'Website will be redesigned and redeployed to production',
+              owner: 'Sarah Chen',
+              deadline: '2025-12-15T00:00:00.000Z',
+              priority: 'high',
+            },
+            {
+              id: 'prop_124',
+              type: 'idea',
+              title: 'Implement dark mode feature',
+              description: 'Add dark mode toggle to improve user experience',
+              evidence: 'Found in Product Roadmap - suggested by customers',
+              rationale: 'Enhance accessibility and user satisfaction',
+              whatWillHappen: 'CSS variables will be added for theme switching',
+              owner: 'Alex Rodriguez',
+              deadline: '2025-12-31T00:00:00.000Z',
+              priority: 'medium',
+            },
+          ],
+          proposalBatchId: 'batch_67890abcdef',
+        },
+        timestamp: '2025-11-28T10:00:00.000Z',
+      },
+      notFound: {
+        code: 404,
+        success: false,
+        message: 'No Notion integration found',
+        data: null,
+        timestamp: '2025-11-28T10:00:00.000Z',
+      },
+      unauthorized: {
+        code: 401,
+        success: false,
+        message: 'Unauthorized',
+        error: 'UnauthorizedException',
+        timestamp: '2025-11-28T10:00:00.000Z',
+      },
+      extractionFailed: {
+        code: 500,
+        success: false,
+        message: 'Failed to extract content from Notion pages',
+        data: null,
+        timestamp: '2025-11-28T10:00:00.000Z',
+      },
+    },
+  },
 } as const;

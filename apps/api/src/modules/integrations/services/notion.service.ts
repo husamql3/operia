@@ -270,6 +270,37 @@ export class NotionService {
     }
   }
 
+  private async fetchFullPagesContent(accessToken: string) {
+    try {
+      this.logger.log('[FETCH_FULL_PAGES] Starting to fetch full pages content from Notion API');
+
+      const response = await fetch(`${env.NOTION_API_BASE_URL}/search`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          page_size: 100,
+          filter: { property: 'object', value: 'page' },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Notion API error: ${response.statusText}`);
+      }
+
+      const data = (await response.json()) as NotionSearchResponse;
+      this.logger.log(`[FETCH_FULL_PAGES] Got ${data.results.length} pages from Notion API`);
+
+      return data.results;
+    } catch (error) {
+      this.logger.error(`[FETCH_FULL_PAGES] Failed to fetch full pages: ${error}`);
+      throw error;
+    }
+  }
+
   private async fetchPagesFromNotion(accessToken: string): Promise<NotionPagesMap> {
     try {
       this.logger.log('[FETCH_PAGES] Starting to fetch pages from Notion API');
@@ -406,6 +437,50 @@ export class NotionService {
     } catch (error) {
       this.logger.error(`Failed to get pages for integration: ${error}`);
       return {};
+    }
+  }
+
+  async syncAndExtractContent(userId: string) {
+    try {
+      this.logger.log(`[SYNC] Starting sync and extraction for user: ${userId}`);
+
+      const integration = await this.getIntegration(userId);
+
+      if (!integration) {
+        this.logger.warn(`[SYNC] No integration found for user: ${userId}`);
+        return {
+          code: 404,
+          success: false,
+          message: 'No Notion integration found',
+          data: null,
+          timestamp: new Date().toISOString(),
+        };
+      }
+
+      this.logger.log(`[SYNC] Fetching full pages content from Notion`);
+      const pages = await this.fetchFullPagesContent(integration.accessToken);
+
+      this.logger.log(`[SYNC] Found ${pages.length} pages to return`);
+
+      return {
+        code: 200,
+        success: true,
+        message: 'Notion content synced successfully',
+        data: {
+          totalPages: pages.length,
+          pages: pages,
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      this.logger.error(`[SYNC] Error during sync: ${error}`);
+      return {
+        code: 500,
+        success: false,
+        message: 'Error syncing Notion content',
+        data: null,
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 }
