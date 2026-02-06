@@ -4,3 +4,4 @@ export { NotionSaveIntegrationDecorator } from './notion-save-integration-endpoi
 export { NotionStatusDecorator } from './notion-status-endpoint.decorator';
 export { NotionDisconnectDecorator } from './notion-disconnect-endpoint.decorator';
 export { NotionGetPagesDecorator } from './notion-get-pages-endpoint.decorator';
+export { NotionSyncDecorator } from './notion-sync-endpoint.decorator';

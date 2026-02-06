@@ -66,6 +66,23 @@ const envSchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string().min(1, 'CLOUDINARY_CLOUD_NAME is required'),
   CLOUDINARY_API_KEY: z.string().min(1, 'CLOUDINARY_API_KEY is required'),
   CLOUDINARY_API_SECRET: z.string().min(1, 'CLOUDINARY_API_SECRET is required'),
+
+  // Azure OpenAI / AI Service Configuration
+  AZURE_OPENAI_ENDPOINT: z.string().min(1, 'AZURE_OPENAI_ENDPOINT is required'),
+  AZURE_OPENAI_API_KEY: z.string().min(1, 'AZURE_OPENAI_API_KEY is required'),
+  AZURE_OPENAI_DEPLOYMENT: z.string().min(1, 'AZURE_OPENAI_DEPLOYMENT is required'),
+  AZURE_OPENAI_API_VERSION: z.string().default('2024-05-01-preview'),
+
+  // AI Service Configuration
+  AI_AGENT_NAME: z.string().default('Operia'),
+  AI_MEMORY_WINDOW_DAYS: z.coerce.number().default(7),
+  AI_MAX_PROPOSALS_PER_BATCH: z.coerce.number().default(20),
+  AI_TEMPERATURE: z.coerce.number().default(0.3),
+  AI_MAX_TOKENS: z.coerce.number().default(4000),
+  AI_DEBUG_MODE: z
+    .string()
+    .default('false')
+    .transform((val) => val === 'true'),
 });
 
 const parsed = envSchema.safeParse(process.env);
