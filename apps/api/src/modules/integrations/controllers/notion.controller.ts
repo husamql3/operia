@@ -2,10 +2,10 @@ import { Controller, Get, Post, Query, UseGuards, Logger, Res, Body } from '@nes
 import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { NotionService } from '../services/notion.service';
-import { AIService } from '@/common/services';
+import { AIService, TasksService } from '@/common/services';
 import { Public, CurrentUser, JwtAuthGuard } from '@/common';
 import { env } from '@/env';
-import { TaskSource, DEFAULT_SKILLS } from '@/common/types/ai.types';
+import { TaskSource, DEFAULT_SKILLS, ProposalType } from '@/common/types/ai.types';
 import {
   NotionInitiateOAuthDecorator,
   NotionCallbackDecorator,
@@ -23,6 +23,7 @@ export class NotionController {
   constructor(
     private readonly notionService: NotionService,
     private readonly aiService: AIService,
+    private readonly tasksService: TasksService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -302,13 +303,38 @@ export class NotionController {
         'Notion All Pages Sync',
         DEFAULT_SKILLS,
         '',
-        userId,
       );
 
       if (result.success) {
         this.logger.log(
           `[SYNC] Successfully extracted ${result.proposalsCount} proposals from all pages`,
         );
+
+        // Filter and save only create_task proposals
+        const createTaskProposals =
+          result.proposals?.filter((p) => p.type === ProposalType.CREATE_TASK) || [];
+        let savedTasksCount = 0;
+
+        if (createTaskProposals.length > 0) {
+          try {
+            const taskInputs = createTaskProposals.map((proposal) => ({
+              userId,
+              title: proposal.title,
+              description: proposal.description,
+              sourceType: TaskSource.NOTION,
+              tags: proposal.evidence || [],
+              priority: proposal.priority,
+              endDate: proposal.deadline ? new Date(proposal.deadline) : undefined,
+            }));
+
+            await this.tasksService.createManyTasks(taskInputs);
+            savedTasksCount = taskInputs.length;
+            this.logger.log(`[SYNC] Saved ${savedTasksCount} tasks from proposals`);
+          } catch (taskError) {
+            this.logger.error(`[SYNC] Failed to save tasks: ${taskError}`);
+          }
+        }
+
         return {
           code: 200,
           success: true,
@@ -318,6 +344,7 @@ export class NotionController {
             proposalsCount: result.proposalsCount,
             proposals: result.proposals,
             proposalBatchId: result.proposalBatchId,
+            savedTasksCount,
           },
           timestamp: new Date().toISOString(),
         };

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AIConfigService, AIService } from '@/common/services';
+import { AIConfigService, AIService, TasksService } from '@/common/services';
 
 /**
  * AI Module
@@ -9,7 +9,7 @@ import { AIConfigService, AIService } from '@/common/services';
  */
 @Module({
   controllers: [],
-  providers: [AIConfigService, AIService],
-  exports: [AIConfigService, AIService],
+  providers: [AIConfigService, AIService, TasksService],
+  exports: [AIConfigService, AIService, TasksService],
 })
 export class AIModule {}
