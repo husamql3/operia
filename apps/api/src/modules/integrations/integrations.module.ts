@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { NotionController } from './controllers';
-import { NotionService } from './services';
+import { NotionController, GitHubController } from './controllers';
+import { NotionService, GitHubService } from './services';
 import { AIModule } from '../ai/ai.module';
 
 @Module({
   imports: [AIModule],
-  controllers: [NotionController],
-  providers: [NotionService],
-  exports: [NotionService],
+  controllers: [NotionController, GitHubController],
+  providers: [NotionService, GitHubService],
+  exports: [NotionService, GitHubService],
 })
 export class IntegrationsModule {}

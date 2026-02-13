@@ -80,8 +80,10 @@ export class UploadController {
                   fileMimetype = fileInfo.mimeType;
 
                   const chunks: Buffer[] = [];
-                  file.on('data', (data) => {
-                    chunks.push(data);
+                  file.on('data', (data: unknown) => {
+                    if (Buffer.isBuffer(data)) {
+                      chunks.push(data);
+                    }
                   });
 
                   file.on('end', () => {

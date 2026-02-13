@@ -3,9 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 import { AIConfigService } from './ai-config.service';
 import {
   TaskSource,
-  ProposalStatus,
   Proposal,
-  ProposalBatch,
   ExtractionResult,
   LLMMessage,
   LLMResponse,
@@ -183,7 +181,11 @@ export class AIService {
       this.logger.error('Error calling Azure OpenAI API:', error);
 
       if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.error?.message || error.message;
+        const errorData = error.response?.data as unknown;
+        const errorMessage =
+          (typeof errorData === 'object' && errorData !== null && 'error' in errorData
+            ? (errorData as { error: { message?: string } }).error?.message
+            : null) || error.message;
         throw new Error(`Azure OpenAI API Error: ${errorMessage}`);
       }
 
@@ -206,7 +208,6 @@ export class AIService {
     sourceName: string = '',
     skills: AISkills = DEFAULT_SKILLS,
     memoryContext: string = '',
-    userId: string = 'default',
   ): Promise<ExtractionResult> {
     try {
       // Build the skills list for the prompt
@@ -233,10 +234,10 @@ export class AIService {
       const response = await this.callLLMDirect(messages, { type: 'json_object' });
 
       // Parse the response
-      let responseData: { proposals: Proposal[] };
+      let parsedData: unknown;
 
       try {
-        responseData = JSON.parse(response);
+        parsedData = JSON.parse(response);
       } catch {
         this.logger.error('Failed to parse LLM response as JSON:', response);
         return {
@@ -245,6 +246,8 @@ export class AIService {
           error: 'Failed to parse AI response. The response was not valid JSON.',
         };
       }
+
+      const responseData = parsedData as { proposals: Proposal[] };
 
       // Validate and process proposals
       if (!responseData.proposals || !Array.isArray(responseData.proposals)) {
@@ -255,18 +258,7 @@ export class AIService {
         };
       }
 
-      // Create the proposal batch
       const batchId = uuidv4();
-      const batch: ProposalBatch = {
-        id: batchId,
-        userId,
-        sourceType,
-        sourceName,
-        proposals: responseData.proposals,
-        createdAt: new Date(),
-        status: ProposalStatus.PENDING,
-      };
-
       this.logger.log(`Successfully extracted ${responseData.proposals.length} proposals`);
 
       return {
@@ -315,20 +307,20 @@ export class AIService {
       const response = await this.callLLMDirect(messages, { type: 'json_object' });
 
       // Parse the response
-      let summaryData: {
+      let parsedResponse: unknown;
+      try {
+        parsedResponse = JSON.parse(response);
+      } catch {
+        this.logger.error('Failed to parse summary response as JSON:', response);
+        return null;
+      }
+      const summaryData = parsedResponse as {
         summaryText: string;
         highlights: string[];
         pendingItems: string[];
         upcomingDeadlines: string[];
         tomorrowFocus: string[];
       };
-
-      try {
-        summaryData = JSON.parse(response);
-      } catch {
-        this.logger.error('Failed to parse summary response as JSON:', response);
-        return null;
-      }
 
       // Create the daily summary object
       const summary: DailySummary = {

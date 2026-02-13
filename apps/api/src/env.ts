@@ -59,6 +59,12 @@ const envSchema = z.object({
   NOTION_REDIRECT_URI: z.string().default('http://localhost:3000/api/integrations/notion/callback'),
   NOTION_API_BASE_URL: z.string().default('https://api.notion.com/v1'),
 
+  // GitHub OAuth
+  GITHUB_CLIENT_ID: z.string().min(1, 'GITHUB_CLIENT_ID is required'),
+  GITHUB_CLIENT_SECRET: z.string().min(1, 'GITHUB_CLIENT_SECRET is required'),
+  GITHUB_APP_ID: z.string().min(1, 'GITHUB_APP_ID is required'),
+  GITHUB_REDIRECT_URI: z.string().default('http://localhost:3000/api/integrations/github/callback'),
+
   // Client URL for redirects
   CLIENT_URL: z.string().default('http://localhost:5173'),
 
